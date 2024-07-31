@@ -1,10 +1,5 @@
 import React, {useState} from 'react';
-import {
-  Text,
-  View,
-  TouchableWithoutFeedback,
-  Image,
-} from 'react-native';
+import {Text, View, TouchableWithoutFeedback, Image} from 'react-native';
 import {observer} from 'mobx-react';
 import {StackScreenProps} from '@react-navigation/stack';
 import {RootStackParamList} from '@/navigator';
@@ -67,10 +62,10 @@ const LoginScreen: React.FC<ILoginScreenProps> = ({navigation}) => {
           value={state.password}
           style={{height: 36}}
           placeholder="登录密码"
-          type={show ? "text" : "password"}
+          type={show ? 'text' : 'password'}
           InputRightElement={
             <Pressable onPress={() => setShow(!show)}>
-              <View style={{ marginRight: 10 }}>
+              <View style={{marginRight: 10}}>
                 <IconFont name={show ? 'icon-eye' : 'icon-no_eye'} />
               </View>
             </Pressable>
@@ -79,7 +74,10 @@ const LoginScreen: React.FC<ILoginScreenProps> = ({navigation}) => {
       </Stack>
 
       <View style={{marginTop: 20}}>
-        <Button onPress={handleSubmit} bgColor={'purple.700'} isLoading={userStore.loading}>
+        <Button
+          onPress={handleSubmit}
+          bgColor={'purple.700'}
+          isLoading={userStore.loading}>
           {userStore.loading ? 'LOADING' : isLogin ? '立即登录' : '立即注册'}
         </Button>
       </View>

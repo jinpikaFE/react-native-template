@@ -51,7 +51,8 @@ const _MeScreen: React.FC = () => {
         }}>
         <Image
           source={{uri: userInfo.avatar}}
-          style={{width: 100, height: 100}}></Image>
+          style={{width: 100, height: 100}}
+        />
         <Text style={{fontSize: 20, marginTop: 20}}>
           {userInfo.nickname}({userInfo.id})
         </Text>

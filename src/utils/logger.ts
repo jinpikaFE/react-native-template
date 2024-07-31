@@ -16,7 +16,7 @@ const config = !isLiveEnv
       transport: fileAsyncTransport,
       transportOptions: {
         FS: RNFS,
-        fileName: `app_logs_{date-today}.log`,
+        fileName: 'app_logs_{date-today}.log',
       },
     }
   : {

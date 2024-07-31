@@ -1,7 +1,11 @@
 import React, {useState} from 'react';
 import {TextInput, TextInputProps, View} from 'react-native';
 
-const BTextArea: React.FC<TextInputProps> = ({ value, onContentSizeChange, ...restProps }) => {
+const BTextArea: React.FC<TextInputProps> = ({
+  value,
+  onContentSizeChange,
+  ...restProps
+}) => {
   const [state, setState] = useState({
     height: 0,
   });

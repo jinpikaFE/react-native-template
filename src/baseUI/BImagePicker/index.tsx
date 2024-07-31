@@ -76,7 +76,7 @@
 //   };
 
 //   const uploadImage = async (uri: string) => {
-//     const realPath = Platform.OS === 'ios' ? uri.replace('file://', '') : uri; 
+//     const realPath = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
 //     return RNFetchBlob.fetch('POST', baseURL + '/upload/s3', {
 //       'Content-Type' : 'multipart/form-data',
 //     }, [

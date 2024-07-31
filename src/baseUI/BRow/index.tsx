@@ -1,20 +1,15 @@
 import * as React from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  ViewProps,
-} from 'react-native';
+import {StyleSheet, View, Text, ViewProps} from 'react-native';
 
 type IProps = {
-    label: React.ReactNode;
-    value: React.ReactNode;
-  } & ViewProps
+  label: React.ReactNode;
+  value: React.ReactNode;
+} & ViewProps;
 
 const BRow: React.FC<IProps> = props => {
   return (
     <View style={styles.row}>
-      <Text style={styles.label}>{props.label}:{' '}</Text>
+      <Text style={styles.label}>{props.label}: </Text>
       <Text style={styles.value}>{props.value}</Text>
     </View>
   );
@@ -34,5 +29,5 @@ const styles = StyleSheet.create({
   value: {
     color: '#666',
     lineHeight: 24,
-  }
-})
+  },
+});

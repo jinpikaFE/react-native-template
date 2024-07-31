@@ -30,21 +30,21 @@ export const FsScreen = observer(() => {
         console.log();
       })
       .catch((err: any) => {
-        console.log(`Failed`);
+        console.log('Failed');
         console.log(err.message);
       });
   };
 
   const download = async () => {
-    const path = RNFS.DocumentDirectoryPath + '/test.jpeg'
+    const path = RNFS.DocumentDirectoryPath + '/test.jpeg';
     const res = RNFS.downloadFile({
       fromUrl: 'http://s3.airtlab.com/a5.jpeg',
-      toFile:  path
-    })
+      toFile: path,
+    });
     const data = await res.promise;
-    console.log(`write res`, data)
-    console.log(`path: ${path}`)
-  }
+    console.log('write res', data);
+    console.log(`path: ${path}`);
+  };
 
   return (
     <BPage showNavBar={true}>
@@ -53,7 +53,7 @@ export const FsScreen = observer(() => {
           <Text style={{color: '#fff'}}>File Creation</Text>
         </Button>
 
-        <Button style={{ marginTop: 10 }} onPress={() => download()}>
+        <Button style={{marginTop: 10}} onPress={() => download()}>
           <Text style={{color: '#fff'}}>Download Image</Text>
         </Button>
       </View>

@@ -36,27 +36,27 @@ export function FruitList() {
           );
         }}
         onRefresh={callback => {
-          console.log(`onRefresh`)
-          const list = (new Array(20)).fill(undefined).map((_, i) => {
+          console.log('onRefresh');
+          const list = new Array(20).fill(undefined).map((_, i) => {
             return `${i}`;
-          })
+          });
           setTimeout(() => {
-            setFinished(false)
-            setData(list)
+            setFinished(false);
+            setData(list);
             callback();
           }, 2000);
         }}
         onLoad={callback => {
-          console.log(`onLoad`)
-          const list = (new Array(20)).fill(undefined).map((_, i) => {
+          console.log('onLoad');
+          const list = new Array(20).fill(undefined).map((_, i) => {
             return `${data.length + i}`;
-          })
+          });
           setTimeout(() => {
             const newList = [...data, ...list];
             if (newList.length > 50) {
-              setFinished(true)
+              setFinished(true);
             }
-            setData(newList)
+            setData(newList);
             callback();
           }, 2000);
         }}

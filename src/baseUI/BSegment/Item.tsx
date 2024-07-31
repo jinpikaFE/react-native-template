@@ -1,5 +1,11 @@
 import React, {useContext} from 'react';
-import {View, Text, StyleSheet, ViewStyle, TouchableWithoutFeedback} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ViewStyle,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import {SegmentedControllerContext} from './index';
 
 interface IProps {
@@ -13,9 +19,11 @@ const MSegmentedItem: React.FC<IProps> = ({index, style, title}) => {
   const handleClick = () => context?.onSelected(index);
 
   return (
-    <View style={[style, styles.container]} onLayout={(event) => {
-      context?.onMeasureItem(index, event.nativeEvent.layout)
-    }}>
+    <View
+      style={[style, styles.container]}
+      onLayout={event => {
+        context?.onMeasureItem(index, event.nativeEvent.layout);
+      }}>
       <TouchableWithoutFeedback onPress={handleClick}>
         <Text style={styles.title}>{title}</Text>
       </TouchableWithoutFeedback>

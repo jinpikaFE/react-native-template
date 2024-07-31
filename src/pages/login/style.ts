@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import {StyleSheet} from 'react-native';
 import theme from '@/utils/theme';
 
 const styles = StyleSheet.create({
@@ -64,4 +64,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export { styles }
+export {styles};

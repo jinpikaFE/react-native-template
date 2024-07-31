@@ -70,9 +70,9 @@ export function BList<Item>(props: BListProps<Item>) {
   }, [isRefreshing]);
 
   function onRelease() {
-    console.log(`scroll`, offsetY + 10 + flatHeight, contentHeight);
+    console.log('scroll', offsetY + 10 + flatHeight, contentHeight);
     if (offsetY <= -refreshingHeight && !isRefreshing && !isLoading) {
-      console.log(`reach refresh`);
+      console.log('reach refresh');
       setIsRefreshing(true);
       props.onRefresh(() => {
         setIsRefreshing(false);
@@ -83,7 +83,7 @@ export function BList<Item>(props: BListProps<Item>) {
       !isRefreshing &&
       !isLoading
     ) {
-      console.log(`reach bottom`);
+      console.log('reach bottom');
       setIsLoading(true);
       props.onLoad(() => {
         setIsLoading(false);

@@ -17,7 +17,7 @@ export default function AnimateScreen() {
       <View style={{paddingHorizontal: 12}}>
         <Button
           onPress={() => {
-            console.log(`click stop`);
+            console.log('click stop');
             animationRef.current?.pause();
           }}>
           stop
@@ -26,7 +26,7 @@ export default function AnimateScreen() {
         <Button
           style={{marginTop: 10}}
           onPress={() => {
-            console.log(`click resume`);
+            console.log('click resume');
             animationRef.current?.resume();
           }}>
           resume
@@ -35,7 +35,7 @@ export default function AnimateScreen() {
         <Button
           style={{marginTop: 10}}
           onPress={() => {
-            console.log(`click play`);
+            console.log('click play');
             animationRef.current?.play();
           }}>
           play

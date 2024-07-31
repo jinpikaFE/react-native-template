@@ -1,12 +1,8 @@
 import React from 'react';
-import {
-  View,
-  Platform,
-  ViewProps,
-} from 'react-native';
+import {View, Platform, ViewProps} from 'react-native';
 import {BNavBar, IBNavBar} from './BNavBar';
 
-const BNPage: React.FC<{ navBarOptions: IBNavBar } & ViewProps> = ({
+const BNPage: React.FC<{navBarOptions: IBNavBar} & ViewProps> = ({
   navBarOptions = {},
   children,
   style = {},

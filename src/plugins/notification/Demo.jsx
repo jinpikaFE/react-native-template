@@ -14,7 +14,7 @@ export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      num: 0
+      num: 0,
     };
 
     this.notif = new NotifService(
@@ -29,25 +29,28 @@ export default class App extends Component {
         <Text style={styles.title}>
           Example app react-native-push-notification
         </Text>
-        <View style={styles.spacer}></View>
+        <View style={styles.spacer} />
         <TextInput
           style={styles.textField}
           value={this.state.registerToken}
           placeholder="Register token"
         />
-        <View style={styles.spacer}></View>
+        <View style={styles.spacer} />
 
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
             this.notif.localNotif();
-            this.setState((prev) => ({ ...prev, num: prev.num + 1 }), () => {
-              PushNotification.setApplicationIconBadgeNumber(this.state.num)
-            })
+            this.setState(
+              prev => ({...prev, num: prev.num + 1}),
+              () => {
+                PushNotification.setApplicationIconBadgeNumber(this.state.num);
+              },
+            );
           }}>
           <Text>Local Notification (now)</Text>
         </TouchableOpacity>
-  
+
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
@@ -107,7 +110,9 @@ export default class App extends Component {
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
-            this.notif.getScheduledLocalNotifications(notifs => console.log(notifs));
+            this.notif.getScheduledLocalNotifications(notifs =>
+              console.log(notifs),
+            );
           }}>
           <Text>Console.Log Scheduled Local Notifications</Text>
         </TouchableOpacity>
@@ -133,11 +138,11 @@ export default class App extends Component {
           <Text>popInitialNotification</Text>
         </TouchableOpacity>
 
-        <View style={styles.spacer}></View>
+        <View style={styles.spacer} />
 
         {this.state.fcmRegistered && <Text>FCM Configured !</Text>}
 
-        <View style={styles.spacer}></View>
+        <View style={styles.spacer} />
       </View>
     );
   }

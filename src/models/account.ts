@@ -4,7 +4,7 @@ import {RootStore} from '.';
 import * as AccountAPI from '../services/account';
 import {IUserInfo} from '@/types/UserInfo';
 import {ILoginReq} from '../services/account';
-import { getUserInfo, logout, setToken, setUserInfo } from '@/utils/auth';
+import {getUserInfo, logout, setToken, setUserInfo} from '@/utils/auth';
 
 export class UserStore {
   public rootStore: RootStore;
@@ -13,7 +13,7 @@ export class UserStore {
     this.rootStore = store;
     makeAutoObservable(this, {
       loading: observable,
-      userInfo: observable
+      userInfo: observable,
     });
   }
 
@@ -41,8 +41,8 @@ export class UserStore {
     }
   }
 
-  async logout () {
-    await logout()
+  async logout() {
+    await logout();
     runInAction(() => {
       this.userInfo = null;
     });

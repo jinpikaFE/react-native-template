@@ -18,7 +18,7 @@ const fruitsAnimation = require('@/assets/animation/bounce-fruit.json');
 
 import {FruitList} from './List';
 
-export const ContactScreen = FruitList
+export const ContactScreen = FruitList;
 
 export const ContactScreen1 = observer(() => {
   const store = useStore();

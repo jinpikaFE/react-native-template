@@ -25,8 +25,8 @@ export const theme = {
 export const nativeTheme = extendTheme({
   colors: {
     primary: {
-      800: "#3765f0", // 按钮 press in 背景颜色
-      600: "#6085f4", // 按钮默认背景
+      800: '#3765f0', // 按钮 press in 背景颜色
+      600: '#6085f4', // 按钮默认背景
     },
   },
 });

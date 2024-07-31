@@ -1,12 +1,6 @@
 import BPage from '@/baseUI/BPage';
 import React, {Component} from 'react';
-import {
-  Alert,
-  Animated,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {Alert, Animated, StyleSheet, Text, View} from 'react-native';
 import {RNCamera} from 'react-native-camera';
 
 export class CameraScreen extends Component<any, any> {
@@ -32,7 +26,7 @@ export class CameraScreen extends Component<any, any> {
 
   //  识别二维码
   onBarCodeRead = (result: any) => {
-    Alert.alert(result.data)
+    Alert.alert(result.data);
   };
 
   render() {

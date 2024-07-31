@@ -16,8 +16,8 @@ import H5Screen from '@/pages/h5';
 import LoginScreen from '@/pages/login';
 import AnimateScreen from '@/pages/animate';
 import {FsScreen} from '@/pages/fs';
-import { CameraScreen } from '@/pages/camera';
-import { TableScreen } from '@/pages/table';
+import {CameraScreen} from '@/pages/camera';
+import {TableScreen} from '@/pages/table';
 
 export type RootStackParamList = {
   MainTab: NavigatorScreenParams<MainTabParamList>;
@@ -87,7 +87,11 @@ function RootStackScreen() {
         />
       </RootStack.Group>
       <RootStack.Group screenOptions={{presentation: 'modal'}}>
-        <RootStack.Screen options={{headerShown: false}} name="Login" component={LoginScreen} />
+        <RootStack.Screen
+          options={{headerShown: false}}
+          name="Login"
+          component={LoginScreen}
+        />
       </RootStack.Group>
     </RootStack.Navigator>
   );

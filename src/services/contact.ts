@@ -15,5 +15,5 @@ export const getContactList = (data: {}) => {
         list: IContactItem[];
       }>
     >
-  >({ url: '/friend/query_friend_list', data });
+  >({url: '/friend/query_friend_list', data});
 };

@@ -23,7 +23,7 @@ const liveConfig: ENV_CONFIG = {};
 const envMap = {
   development: devConfig,
   test: testConfig,
-  production: liveConfig
-}
+  production: liveConfig,
+};
 
-export const envConfig = envMap[NODE_ENV]
+export const envConfig = envMap[NODE_ENV];

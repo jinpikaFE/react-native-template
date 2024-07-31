@@ -1,7 +1,7 @@
 import {runInAction, makeAutoObservable, observable} from 'mobx';
 import {RootStore} from '.';
 import {ILoginReq} from '../services/account';
-import { getContactList, IContactItem } from '@/services/contact';
+import {getContactList, IContactItem} from '@/services/contact';
 
 export class ContactStore {
   public rootStore: RootStore;
@@ -20,7 +20,7 @@ export class ContactStore {
   async fetchContacts() {
     runInAction(() => {
       this.loading = true;
-    })
+    });
     try {
       const res: AwaitedFun<typeof getContactList> = await getContactList({});
       runInAction(() => {

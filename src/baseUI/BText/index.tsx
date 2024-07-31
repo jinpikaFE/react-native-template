@@ -14,7 +14,7 @@ const TextFontSizeMap = {
   normal: 14,
   small: 12,
   mini: 10,
-}
+};
 
 type ITextFontTheme = 'gray' | 'info' | 'second' | 'main';
 const TextFontThemeMap = {
@@ -22,7 +22,7 @@ const TextFontThemeMap = {
   second: '#6d6b6b',
   gray: '#888',
   info: '#72ace8',
-}
+};
 
 const BText: React.FC<{
   type?: ITextFontTheme;
@@ -34,7 +34,7 @@ const BText: React.FC<{
     ...defaultStyle,
     color: TextFontThemeMap[type],
     fontSize: TextFontSizeMap[size],
-    ...style
+    ...style,
   };
 
   return (

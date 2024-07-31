@@ -14,13 +14,13 @@ import {NativeBaseProvider} from 'native-base';
 import {loadCacheUInfo} from './utils/auth';
 import {View, Text} from 'react-native';
 import {logger} from './utils/logger';
-import { nativeTheme } from './config/theme';
+import {nativeTheme} from './config/theme';
 
 export default function App() {
   const [isLoaded, setIsLoaded] = React.useState(false);
 
   React.useEffect(() => {
-    logger.info(`init application`);
+    logger.info('init application');
     beforeBootstrap().then(() => {
       setIsLoaded(true);
     });

@@ -17,9 +17,7 @@ export const TOP_INSERT_HEIGHT = Platform.OS === 'android' ? 24 : 36;
 
 // 不安全区域填充
 export const TopInsertView: React.FC<ViewProps> = ({style, ...restProps}) => {
-  return (
-    <View style={[{height: TOP_INSERT_HEIGHT}, style]} {...restProps}></View>
-  );
+  return <View style={[{height: TOP_INSERT_HEIGHT}, style]} {...restProps} />;
 };
 
 export interface IBNavBar {
@@ -58,7 +56,9 @@ const BNavBar: React.FC<IBNavBar> = ({
 
   const renderLeft = () => {
     const getContent = () => {
-      if (navLeft) return navLeft;
+      if (navLeft) {
+        return navLeft;
+      }
       if (showBack) {
         return (
           <TouchableHighlight
@@ -115,7 +115,7 @@ const BNavBar: React.FC<IBNavBar> = ({
         barStyle={'dark-content'}
         backgroundColor="transparent"
       />
-      {useTopInsert && <View style={[styles.topInsert, topInsertStyle]}></View>}
+      {useTopInsert && <View style={[styles.topInsert, topInsertStyle]} />}
       {showNavBar && (
         <View style={[styles.navbar, borderStyle, navbarStyle]}>
           {renderLeft()}

@@ -6,4 +6,4 @@
  * @FilePath: /react-native-template/src/utils/date.ts
  * @Description: date format
  */
-export {}
+export {};

@@ -4,13 +4,13 @@
  * @Date: 2023-01-04 18:54:11
  * @LastEditTime: 2023-04-13 18:55:31
  * @FilePath: /react-native-template/src/models/index.ts
- * @Description: 
+ * @Description:
  */
 import {makeObservable, observable, action} from 'mobx';
 import {computed} from 'mobx';
-import React, { createContext } from 'react';
-import { UserStore } from "./account";
-import { ContactStore } from './contact';
+import React, {createContext} from 'react';
+import {UserStore} from './account';
+import {ContactStore} from './contact';
 
 class Todo {
   id = Math.random();
@@ -62,7 +62,7 @@ export class RootStore {
   contactStore: ContactStore;
   todos: TodoList;
 
-  constructor () {
+  constructor() {
     this.userStore = new UserStore(this);
     this.contactStore = new ContactStore(this);
 
@@ -79,5 +79,5 @@ export const StoreContext = createContext<{
 }>(rootStore);
 
 export function useStore() {
-  return React.useContext(StoreContext)
+  return React.useContext(StoreContext);
 }

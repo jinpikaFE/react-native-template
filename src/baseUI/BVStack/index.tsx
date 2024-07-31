@@ -10,12 +10,7 @@ const BVStack: React.FC<{
         justifyContent: 'space-between',
       }
     : {};
-  return (
-    <View
-      style={{ ..._style, ...style}}>
-      {children}
-    </View>
-  );
+  return <View style={{..._style, ...style}}>{children}</View>;
 };
 
 export default BVStack;

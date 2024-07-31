@@ -1,5 +1,8 @@
 import * as React from 'react';
-import {BottomTabNavigationProp, createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {
+  BottomTabNavigationProp,
+  createBottomTabNavigator,
+} from '@react-navigation/bottom-tabs';
 import {
   IconContactO,
   IconHome,
@@ -15,8 +18,8 @@ import IconContact from '@/assets/iconfont/IconContact';
 import {HomeScreen} from '@/pages/home';
 import {ContactScreen} from '@/pages/contact';
 import {MeScreen} from '@/pages/me';
-import { RouteProp } from '@react-navigation/native';
-import { RootStackNavigation, RootStackParamList } from '.';
+import {RouteProp} from '@react-navigation/native';
+import {RootStackNavigation, RootStackParamList} from '.';
 
 export type MainTabParamList = {
   Home: undefined;
@@ -33,7 +36,7 @@ export interface MainTabProps {
 
 const Tab = createBottomTabNavigator();
 
-const RootStack: React.FC<MainTabProps>  = () => {
+const RootStack: React.FC<MainTabProps> = () => {
   return (
     <Tab.Navigator
       tabBar={props => <MainTabBar {...props} />}

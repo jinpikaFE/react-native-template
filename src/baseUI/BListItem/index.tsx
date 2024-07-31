@@ -13,7 +13,14 @@ interface IProps {
   value?: React.ReactNode;
 }
 
-const BListItem: React.FC<IProps> = ({title, icon, link = true, border = true, value, ...rest}) => {
+const BListItem: React.FC<IProps> = ({
+  title,
+  icon,
+  link = true,
+  border = true,
+  value,
+  ...rest
+}) => {
   return (
     <MTouchableOpacity {...rest}>
       <View style={styles.item}>
@@ -21,10 +28,10 @@ const BListItem: React.FC<IProps> = ({title, icon, link = true, border = true, v
           <Text style={styles.title}>{title}</Text>
           <BHStack>
             {value ? value : null}
-            {link && <IconArrowRight color={'#ddd'} /> }
+            {link && <IconArrowRight color={'#ddd'} />}
           </BHStack>
         </View>
-        {border && <View style={styles.line}></View>}
+        {border && <View style={styles.line} />}
       </View>
     </MTouchableOpacity>
   );

@@ -3,10 +3,10 @@ import {StyleSheet, View} from 'react-native';
 import IconKongbai1 from '../icon/IconKongbai1';
 import BText from '../BText';
 
-const BEmpty: React.FC<{ showIcon?: boolean }> = ({ showIcon = true }) => {
+const BEmpty: React.FC<{showIcon?: boolean}> = ({showIcon = true}) => {
   return (
     <View style={styles.box}>
-      {showIcon && <IconKongbai1 size={100}/> }
+      {showIcon && <IconKongbai1 size={100} />}
       <BText type="gray">暂无数据</BText>
     </View>
   );

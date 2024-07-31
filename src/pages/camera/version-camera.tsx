@@ -20,7 +20,7 @@
 // import {useScanBarcodes, BarcodeFormat} from 'vision-camera-code-scanner';
 // import BPage from '@/baseUI/BPage';
 
-import { Text, View } from "react-native"
+import {Text, View} from 'react-native';
 
 // export function CameraScreen() {
 //   const [hasMicrophonePermission, setHasMicrophonePermission] = useState(false);
@@ -82,11 +82,10 @@ import { Text, View } from "react-native"
 //   },
 // });
 
-
 export const CameraScreen = () => {
   return (
     <View>
       <Text>Hello</Text>
     </View>
-  )
-}
+  );
+};

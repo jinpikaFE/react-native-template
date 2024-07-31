@@ -26,7 +26,7 @@ const BPage: React.FC<ViewProps & IBNavBar> = ({
     navRight,
     navLeft,
     title,
-    topInsertBgColor
+    topInsertBgColor,
   };
 
   return (
@@ -37,7 +37,7 @@ const BPage: React.FC<ViewProps & IBNavBar> = ({
         backgroundColor="transparent"
       />
       <BNavBar {...navBarProps} />
-      <View style={{flex: 1, width: '100%' }}>{children}</View>
+      <View style={{flex: 1, width: '100%'}}>{children}</View>
     </View>
   );
 };
