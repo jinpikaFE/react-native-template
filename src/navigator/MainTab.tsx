@@ -47,7 +47,7 @@ const RootStack: React.FC<MainTabProps> = () => {
       <Tab.Screen
         name="Home"
         options={{
-          title: '消息',
+          title: '首页',
           tabBarIcon: ({focused, color}: {focused: boolean; color: string}) => {
             return focused ? (
               <IconHome color={color} />
@@ -61,7 +61,7 @@ const RootStack: React.FC<MainTabProps> = () => {
       <Tab.Screen
         name="Contact"
         options={{
-          title: '朋友',
+          title: '功能',
           tabBarIcon: ({focused, color}: {focused: boolean; color: string}) => {
             return focused ? (
               <IconManage color={color} />
