@@ -8511,6 +8511,11 @@ react-is@^18.0.0:
   resolved "https://registry.npmmirror.com/react-is/-/react-is-18.3.1.tgz#e83557dc12eae63a99e003a46388b1dcbb44db7e"
   integrity sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==
 
+react-native-ble-manager@^11.5.5:
+  version "11.5.5"
+  resolved "https://registry.npmmirror.com/react-native-ble-manager/-/react-native-ble-manager-11.5.5.tgz#040564657c5b2abaa97397cac41bf022816826a8"
+  integrity sha512-DPhUkDb8MWiJFpD2lxQdQX5P5QquE0cW/SZLC3cCnk4jx1YXGUI4WTQb9TK3F42FuDVR24Mnclxf5r9WOGoq2A==
+
 react-native-camera@^4.2.1:
   version "4.2.1"
   resolved "https://registry.npmjs.org/react-native-camera/-/react-native-camera-4.2.1.tgz#caf74081f055e89d7e9b0cd5108965d808c60e90"

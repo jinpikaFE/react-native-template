@@ -23,43 +23,30 @@ export const HomeScreen = () => {
         /** 大于md条去除 */
         return newData.length > md ? newData.slice(-md) : newData;
       });
-    }, 100); // 每100ms接收一次新数据
-
-    const interval2 = setInterval(() => {
       setData2((prevData: any) => {
         const newData = [...prevData, Math.random() * 100];
         /** 大于md条去除 */
         return newData.length > md ? newData.slice(-md) : newData;
       });
-    }, 100); // 每100ms接收一次新数据
-    const interval3 = setInterval(() => {
       setData3((prevData: any) => {
         const newData = [...prevData, Math.random() * 100];
         /** 大于md条去除 */
         return newData.length > md ? newData.slice(-md) : newData;
       });
-    }, 100); // 每
-    const interval4 = setInterval(() => {
       setData4((prevData: any) => {
         const newData = [...prevData, Math.random() * 100];
         /** 大于md条去除 */
         return newData.length > md ? newData.slice(-md) : newData;
       });
-    }, 100); // 每
-    const interval5 = setInterval(() => {
       setData5((prevData: any) => {
         const newData = [...prevData, Math.random() * 100];
         /** 大于md条去除 */
         return newData.length > md ? newData.slice(-md) : newData;
       });
-    }, 100); // 每
+    }, 100); // 每100ms接收一次新数据
 
     return () => {
       clearInterval(interval);
-      clearInterval(interval2);
-      clearInterval(interval3);
-      clearInterval(interval4);
-      clearInterval(interval5);
     };
   }, []);
 

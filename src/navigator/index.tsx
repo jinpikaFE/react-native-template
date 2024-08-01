@@ -13,6 +13,9 @@ import {
 import {DetailScreen} from '@/pages/detail';
 import MainTabScreen, {MainTabParamList} from './MainTab';
 import H5Screen from '@/pages/h5';
+import Blutooth from '@/pages/blutooth';
+import PeripheralDetails from '@/pages/blutooth/PeripheralDetailsScreen';
+
 import LoginScreen from '@/pages/login';
 import AnimateScreen from '@/pages/animate';
 import {FsScreen} from '@/pages/fs';
@@ -31,6 +34,8 @@ export type RootStackParamList = {
   Fs: undefined;
   Camera: undefined;
   Table: undefined;
+  Blutooth: undefined;
+  PeripheralDetails: undefined;
 };
 
 export type RootStackNavigation = StackNavigationProp<RootStackParamList>;
@@ -64,6 +69,16 @@ function RootStackScreen() {
           name="H5"
           options={hideHeaderOptions}
           component={H5Screen}
+        />
+        <RootStack.Screen
+          name="Blutooth"
+          options={hideHeaderOptions}
+          component={Blutooth}
+        />
+        <RootStack.Screen
+          name="PeripheralDetails"
+          options={hideHeaderOptions}
+          component={PeripheralDetails}
         />
         <RootStack.Screen
           name="Animate"

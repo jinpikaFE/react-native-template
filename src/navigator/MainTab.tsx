@@ -1,10 +1,4 @@
-import * as React from 'react';
 import {
-  BottomTabNavigationProp,
-  createBottomTabNavigator,
-} from '@react-navigation/bottom-tabs';
-import {
-  IconContactO,
   IconHome,
   IconHomeO,
   IconManage,
@@ -12,14 +6,18 @@ import {
   IconPeople,
   IconPeopleO,
 } from '@/assets/iconfont';
+import {
+  BottomTabNavigationProp,
+  createBottomTabNavigator,
+} from '@react-navigation/bottom-tabs';
+import * as React from 'react';
 
-import {MainTabBar} from './MainTabBar';
-import IconContact from '@/assets/iconfont/IconContact';
-import {HomeScreen} from '@/pages/home';
 import {ContactScreen} from '@/pages/contact';
+import {HomeScreen} from '@/pages/home';
 import {MeScreen} from '@/pages/me';
 import {RouteProp} from '@react-navigation/native';
 import {RootStackNavigation, RootStackParamList} from '.';
+import {MainTabBar} from './MainTabBar';
 
 export type MainTabParamList = {
   Home: undefined;
