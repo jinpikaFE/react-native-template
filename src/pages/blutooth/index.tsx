@@ -1,641 +1,388 @@
-/**
- * Sample BLE React Native App
- */
-
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
+  Alert,
+  FlatList,
+  ListRenderItemInfo,
+  Platform,
   SafeAreaView,
   StyleSheet,
-  View,
   Text,
-  StatusBar,
-  NativeModules,
-  NativeEventEmitter,
-  Platform,
-  PermissionsAndroid,
-  FlatList,
-  TouchableHighlight,
-  Pressable,
+  TouchableOpacity,
+  View,
+  ScrollView,
 } from 'react-native';
-
-import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {useNavigation} from '@react-navigation/native';
-
-import BleManager, {
-  BleDisconnectPeripheralEvent,
-  BleManagerDidUpdateValueForCharacteristicEvent,
-  BleScanCallbackType,
-  BleScanMatchMode,
-  BleScanMode,
+import {
+  BleManagerDidUpdateStateEvent,
   Peripheral,
-  PeripheralInfo,
 } from 'react-native-ble-manager';
+import BleModule from './BleModule';
+import BleProtocol from './BleProtocol';
+import Characteristic from './components/Characteristic';
+import Header from './components/Header';
+import {BleEventType, BleState} from './type';
 
-const SECONDS_TO_SCAN_FOR = 3;
-const SERVICE_UUIDS: string[] = [];
-const ALLOW_DUPLICATES = true;
+// 注意: 需要确保全局只有一个实例，因为BleModule类保存着蓝牙的连接信息
+const bleModule = new BleModule();
 
-const BleManagerModule = NativeModules.BleManager;
-const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
-
-declare module 'react-native-ble-manager' {
-  // enrich local contract with custom state properties needed by App.tsx
-  interface Peripheral {
-    connected?: boolean;
-    connecting?: boolean;
-  }
-}
+const bleProtocol = new BleProtocol();
 
 const ScanDevicesScreen = () => {
-  const navigation = useNavigation();
+  // 蓝牙是否连接
+  const [isConnected, setIsConnected] = useState(false);
+  // 正在扫描中
+  const [scaning, setScaning] = useState(false);
+  // 蓝牙是否正在监听
+  const [isMonitoring, setIsMonitoring] = useState(false);
+  // 当前正在连接的蓝牙id
+  const [connectingId, setConnectingId] = useState('');
+  // 写数据
+  const [writeData, setWriteData] = useState('');
+  // 接收到的数据
+  const [receiveData, setReceiveData] = useState('');
+  // 读取的数据
+  const [readData, setReadData] = useState('');
+  // 输入的内容
+  const [inputText, setInputText] = useState('');
+  // 扫描的蓝牙列表
+  const [dataList, setDataList] = useState<Peripheral[]>([]);
 
-  const [isScanning, setIsScanning] = useState(false);
-  const [peripherals, setPeripherals] = useState(
-    new Map<Peripheral['id'], Peripheral>(),
-  );
-
-  //console.debug('peripherals map updated', [...peripherals.entries()]);
-
-  const startScan = () => {
-    if (!isScanning) {
-      // reset found peripherals before scan
-      setPeripherals(new Map<Peripheral['id'], Peripheral>());
-
-      try {
-        console.debug('[startScan] starting scan...');
-        setIsScanning(true);
-        BleManager.scan(SERVICE_UUIDS, SECONDS_TO_SCAN_FOR, ALLOW_DUPLICATES, {
-          matchMode: BleScanMatchMode.Sticky,
-          scanMode: BleScanMode.LowLatency,
-          callbackType: BleScanCallbackType.AllMatches,
-        })
-          .then(d => {
-            console.debug(d);
-            console.debug('[startScan] scan promise returned successfully.');
-          })
-          .catch((err: any) => {
-            console.error('[startScan] ble scan returned in error', err);
-          });
-      } catch (error) {
-        console.error('[startScan] ble scan error thrown', error);
-      }
-    }
-  };
-
-  const startCompanionScan = () => {
-    setPeripherals(new Map<Peripheral['id'], Peripheral>());
-    try {
-      console.debug('[startCompanionScan] starting companion scan...');
-      BleManager.companionScan(SERVICE_UUIDS, {single: false})
-        .then((peripheral: Peripheral | null) => {
-          console.debug(
-            '[startCompanionScan] scan promise returned successfully.',
-            peripheral,
-          );
-          if (peripheral != null) {
-            setPeripherals(map => {
-              return new Map(map.set(peripheral.id, peripheral));
-            });
-          }
-        })
-        .catch((err: any) => {
-          console.debug('[startCompanionScan] ble scan cancel', err);
-        });
-    } catch (error) {
-      console.error('[startCompanionScan] ble scan error thrown', error);
-    }
-  };
-
-  const enableBluetooth = async () => {
-    try {
-      console.debug('[enableBluetooth]');
-      await BleManager.enableBluetooth();
-    } catch (error) {
-      console.error('[enableBluetooth] thrown', error);
-    }
-  };
-
-  const handleStopScan = () => {
-    setIsScanning(false);
-    console.debug('[handleStopScan] scan is stopped.');
-  };
-
-  const handleDisconnectedPeripheral = (
-    event: BleDisconnectPeripheralEvent,
-  ) => {
-    console.debug(
-      `[handleDisconnectedPeripheral][${event.peripheral}] disconnected.`,
-    );
-    setPeripherals(map => {
-      let p = map.get(event.peripheral);
-      if (p) {
-        p.connected = false;
-        return new Map(map.set(event.peripheral, p));
-      }
-      return map;
-    });
-  };
-
-  const handleConnectPeripheral = (event: any) => {
-    console.log(`[handleConnectPeripheral][${event.peripheral}] connected.`);
-  };
-
-  const handleUpdateValueForCharacteristic = (
-    data: BleManagerDidUpdateValueForCharacteristicEvent,
-  ) => {
-    console.debug(
-      `[handleUpdateValueForCharacteristic] received data from '${data.peripheral}' with characteristic='${data.characteristic}' and value='${data.value}'`,
-    );
-  };
-
-  const handleDiscoverPeripheral = (peripheral: Peripheral) => {
-    console.debug('[handleDiscoverPeripheral] new BLE peripheral=', peripheral);
-    if (!peripheral.name) {
-      peripheral.name = 'NO NAME';
-    }
-    setPeripherals(map => {
-      return new Map(map.set(peripheral.id, peripheral));
-    });
-  };
-
-  const togglePeripheralConnection = async (peripheral: Peripheral) => {
-    if (peripheral && peripheral.connected) {
-      try {
-        await BleManager.disconnect(peripheral.id);
-      } catch (error) {
-        console.error(
-          `[togglePeripheralConnection][${peripheral.id}] error when trying to disconnect device.`,
-          error,
-        );
-      }
-    } else {
-      await connectPeripheral(peripheral);
-    }
-  };
-
-  const retrieveConnected = async () => {
-    try {
-      const connectedPeripherals = await BleManager.getConnectedPeripherals();
-      if (connectedPeripherals.length === 0) {
-        console.warn('[retrieveConnected] No connected peripherals found.');
-        return;
-      }
-
-      console.debug(
-        '[retrieveConnected]',
-        connectedPeripherals.length,
-        'connectedPeripherals',
-        connectedPeripherals,
-      );
-
-      for (let peripheral of connectedPeripherals) {
-        setPeripherals(map => {
-          let p = map.get(peripheral.id);
-          if (p) {
-            p.connected = true;
-            return new Map(map.set(p.id, p));
-          }
-          return map;
-        });
-      }
-    } catch (error) {
-      console.error(
-        '[retrieveConnected] unable to retrieve connected peripherals.',
-        error,
-      );
-    }
-  };
-
-  const retrieveServices = async () => {
-    const peripheralInfos: PeripheralInfo[] = [];
-    for (let [peripheralId, peripheral] of peripherals) {
-      if (peripheral.connected) {
-        const newPeripheralInfo = await BleManager.retrieveServices(
-          peripheralId,
-        );
-        peripheralInfos.push(newPeripheralInfo);
-      }
-    }
-    return peripheralInfos;
-  };
-
-  const readCharacteristics = async () => {
-    let services = await retrieveServices();
-
-    for (let peripheralInfo of services) {
-      peripheralInfo.characteristics?.forEach(async c => {
-        try {
-          const value = await BleManager.read(
-            peripheralInfo.id,
-            c.service,
-            c.characteristic,
-          );
-          console.log(
-            '[readCharacteristics]',
-            'peripheralId',
-            peripheralInfo.id,
-            'service',
-            c.service,
-            'char',
-            c.characteristic,
-            '\n\tvalue',
-            value,
-          );
-        } catch (error) {
-          console.error(
-            '[readCharacteristics]',
-            'Error reading characteristic',
-            error,
-          );
-        }
-      });
-    }
-  };
-
-  const getAssociatedPeripherals = async () => {
-    try {
-      const associatedPeripherals = await BleManager.getAssociatedPeripherals();
-      console.debug(
-        '[getAssociatedPeripherals] associatedPeripherals',
-        associatedPeripherals,
-      );
-
-      for (let peripheral of associatedPeripherals) {
-        setPeripherals(map => {
-          return new Map(map.set(peripheral.id, peripheral));
-        });
-      }
-    } catch (error) {
-      console.error(
-        '[getAssociatedPeripherals] unable to retrieve associated peripherals.',
-        error,
-      );
-    }
-  };
-
-  const connectPeripheral = async (peripheral: Peripheral) => {
-    try {
-      if (peripheral) {
-        setPeripherals(map => {
-          let p = map.get(peripheral.id);
-          if (p) {
-            p.connecting = true;
-            return new Map(map.set(p.id, p));
-          }
-          return map;
-        });
-
-        await BleManager.connect(peripheral.id);
-        console.debug(`[connectPeripheral][${peripheral.id}] connected.`);
-
-        setPeripherals(map => {
-          let p = map.get(peripheral.id);
-          if (p) {
-            p.connecting = false;
-            p.connected = true;
-            return new Map(map.set(p.id, p));
-          }
-          return map;
-        });
-
-        // before retrieving services, it is often a good idea to let bonding & connection finish properly
-        await sleep(900);
-
-        /* Test read current RSSI value, retrieve services first */
-        const peripheralData = await BleManager.retrieveServices(peripheral.id);
-        console.debug(
-          `[connectPeripheral][${peripheral.id}] retrieved peripheral services`,
-          peripheralData,
-        );
-
-        setPeripherals(map => {
-          let p = map.get(peripheral.id);
-          if (p) {
-            return new Map(map.set(p.id, p));
-          }
-          return map;
-        });
-
-        const rssi = await BleManager.readRSSI(peripheral.id);
-        console.debug(
-          `[connectPeripheral][${peripheral.id}] retrieved current RSSI value: ${rssi}.`,
-        );
-
-        if (peripheralData.characteristics) {
-          for (let characteristic of peripheralData.characteristics) {
-            if (characteristic.descriptors) {
-              for (let descriptor of characteristic.descriptors) {
-                try {
-                  let data = await BleManager.readDescriptor(
-                    peripheral.id,
-                    characteristic.service,
-                    characteristic.characteristic,
-                    descriptor.uuid,
-                  );
-                  console.debug(
-                    `[connectPeripheral][${peripheral.id}] ${characteristic.service} ${characteristic.characteristic} ${descriptor.uuid} descriptor read as:`,
-                    data,
-                  );
-                } catch (error) {
-                  console.error(
-                    `[connectPeripheral][${peripheral.id}] failed to retrieve descriptor ${descriptor} for characteristic ${characteristic}:`,
-                    error,
-                  );
-                }
-              }
-            }
-          }
-        }
-
-        setPeripherals(map => {
-          let p = map.get(peripheral.id);
-          if (p) {
-            p.rssi = rssi;
-            return new Map(map.set(p.id, p));
-          }
-          return map;
-        });
-
-        navigation.navigate('PeripheralDetails', {
-          peripheralData: peripheralData,
-        });
-      }
-    } catch (error) {
-      console.error(
-        `[connectPeripheral][${peripheral.id}] connectPeripheral error`,
-        error,
-      );
-    }
-  };
-
-  function sleep(ms: number) {
-    return new Promise<void>(resolve => setTimeout(resolve, ms));
-  }
+  /** 蓝牙接收的数据缓存 */
+  const bleReceiveData = useRef<any[]>([]);
+  /** 使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备 */
+  const deviceMap = useRef(new Map<string, Peripheral>());
 
   useEffect(() => {
-    try {
-      BleManager.start({showAlert: false})
-        .then(() => console.debug('BleManager started.'))
-        .catch((error: any) =>
-          console.error('BeManager could not be started.', error),
-        );
-    } catch (error) {
-      console.error('unexpected error starting BleManager.', error);
+    bleModule.start();
+  }, []);
+
+  useEffect(() => {
+    console.debug(bleModule, 'sss');
+
+    const updateStateListener = bleModule.addListener(
+      BleEventType.BleManagerDidUpdateState,
+      handleUpdateState,
+    );
+    const stopScanListener = bleModule.addListener(
+      BleEventType.BleManagerStopScan,
+      handleStopScan,
+    );
+    const discoverPeripheralListener = bleModule.addListener(
+      BleEventType.BleManagerDiscoverPeripheral,
+      handleDiscoverPeripheral,
+    );
+    const connectPeripheralListener = bleModule.addListener(
+      BleEventType.BleManagerConnectPeripheral,
+      handleConnectPeripheral,
+    );
+    const disconnectPeripheralListener = bleModule.addListener(
+      BleEventType.BleManagerDisconnectPeripheral,
+      handleDisconnectPeripheral,
+    );
+    const updateValueListener = bleModule.addListener(
+      BleEventType.BleManagerDidUpdateValueForCharacteristic,
+      handleUpdateValue,
+    );
+
+    return () => {
+      updateStateListener.remove();
+      stopScanListener.remove();
+      discoverPeripheralListener.remove();
+      connectPeripheralListener.remove();
+      disconnectPeripheralListener.remove();
+      updateValueListener.remove();
+    };
+  }, []);
+
+  /** 蓝牙状态改变 */
+  function handleUpdateState(event: BleManagerDidUpdateStateEvent) {
+    console.log('BleManagerDidUpdateState:', event);
+    bleModule.bleState = event.state;
+    // 蓝牙打开时自动扫描
+    if (event.state === BleState.On) {
+      scan();
+    }
+  }
+
+  /** 扫描结束监听 */
+  function handleStopScan() {
+    console.log('Scanning is stopped');
+    setScaning(false);
+  }
+
+  /** 搜索到一个新设备监听 */
+  function handleDiscoverPeripheral(data: Peripheral) {
+    console.log('BleManagerDiscoverPeripheral:', data);
+    // 蓝牙连接 id
+    let id;
+    // 蓝牙 Mac 地址
+    let macAddress;
+    if (Platform.OS == 'android') {
+      macAddress = data.id;
+      id = macAddress;
+    } else {
+      // ios连接时不需要用到Mac地址，但跨平台识别同一设备时需要 Mac 地址
+      macAddress = bleProtocol.getMacFromAdvertising(data);
+      id = data.id;
+    }
+    deviceMap.current.set(data.id, data);
+    setDataList([...deviceMap.current.values()]);
+  }
+
+  /** 蓝牙设备已连接 */
+  function handleConnectPeripheral(data: Peripheral) {
+    console.log('BleManagerConnectPeripheral:', data);
+  }
+
+  /** 蓝牙设备已断开连接 */
+  function handleDisconnectPeripheral(data: Peripheral) {
+    console.log('BleManagerDisconnectPeripheral:', data);
+    initData();
+  }
+
+  function initData() {
+    // 断开连接后清空UUID
+    bleModule.initUUID();
+    // 断开后显示上次的扫描结果
+    setDataList([...deviceMap.current.values()]);
+    setIsConnected(false);
+    setWriteData('');
+    setReadData('');
+    setReceiveData('');
+    setInputText('');
+  }
+
+  /** 接收到新数据 */
+  function handleUpdateValue(data: any) {
+    let value = data.value as string;
+    console.log('BluetoothUpdateValue:', value);
+
+    bleReceiveData.current.push(value);
+    setReceiveData(bleReceiveData.current.join(''));
+
+    bleProtocol.parseData(value);
+  }
+
+  function scan() {
+    console.debug(bleModule, 'sss1');
+    if (bleModule.bleState !== BleState.On) {
+      enableBluetooth();
       return;
     }
 
-    const listeners = [
-      bleManagerEmitter.addListener(
-        'BleManagerDiscoverPeripheral',
-        handleDiscoverPeripheral,
-      ),
-      bleManagerEmitter.addListener('BleManagerStopScan', handleStopScan),
-      bleManagerEmitter.addListener(
-        'BleManagerDisconnectPeripheral',
-        handleDisconnectedPeripheral,
-      ),
-      bleManagerEmitter.addListener(
-        'BleManagerDidUpdateValueForCharacteristic',
-        handleUpdateValueForCharacteristic,
-      ),
-      bleManagerEmitter.addListener(
-        'BleManagerConnectPeripheral',
-        handleConnectPeripheral,
-      ),
-    ];
-
-    handleAndroidPermissions();
-
-    return () => {
-      console.debug('[app] main component unmounting. Removing listeners...');
-      for (const listener of listeners) {
-        listener.remove();
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleAndroidPermissions = () => {
-    if (Platform.OS === 'android' && Platform.Version >= 31) {
-      PermissionsAndroid.requestMultiple([
-        PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
-        PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-      ]).then(result => {
-        if (result) {
-          console.debug(
-            '[handleAndroidPermissions] User accepts runtime permissions android 12+',
-          );
-        } else {
-          console.error(
-            '[handleAndroidPermissions] User refuses runtime permissions android 12+',
-          );
-        }
+    // 重新扫描时清空列表
+    deviceMap.current.clear();
+    bleModule
+      .scan()
+      .then(() => {
+        setScaning(true);
+      })
+      .catch(err => {
+        setScaning(false);
       });
-    } else if (Platform.OS === 'android' && Platform.Version >= 23) {
-      PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      ).then(checkResult => {
-        if (checkResult) {
-          console.debug(
-            '[handleAndroidPermissions] runtime permission Android <12 already OK',
-          );
-        } else {
-          PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-          ).then(requestResult => {
-            if (requestResult) {
-              console.debug(
-                '[handleAndroidPermissions] User accepts runtime permission android <12',
-              );
-            } else {
-              console.error(
-                '[handleAndroidPermissions] User refuses runtime permission android <12',
-              );
-            }
-          });
-        }
+  }
+
+  function enableBluetooth() {
+    if (Platform.OS === 'ios') {
+      alert('请开启手机蓝牙');
+    } else {
+      Alert.alert('提示', '请开启手机蓝牙', [
+        {
+          text: '取消',
+          onPress: () => {},
+        },
+        {
+          text: '打开',
+          onPress: () => {
+            bleModule.enableBluetooth();
+          },
+        },
+      ]);
+    }
+  }
+
+  /** 连接蓝牙 */
+  function connect(item: Peripheral) {
+    setConnectingId(item.id);
+
+    if (scaning) {
+      // 当前正在扫描中，连接时关闭扫描
+      bleModule.stopScan().then(() => {
+        setScaning(false);
       });
     }
-  };
 
-  const renderItem = ({item}: {item: Peripheral}) => {
-    const backgroundColor = item.connected ? '#069400' : Colors.white;
+    bleModule
+      .connect(item.id)
+      .then(peripheralInfo => {
+        setIsConnected(true);
+        // 连接成功后，列表只显示已连接的设备
+        setDataList([item]);
+      })
+      .catch(err => {
+        alert('连接失败');
+      })
+      .finally(() => {
+        setConnectingId('');
+      });
+  }
+
+  /** 断开连接 */
+  function disconnect() {
+    bleModule.disconnect();
+    initData();
+  }
+
+  function notify(index: number) {
+    bleModule
+      .startNotification(index)
+      .then(() => {
+        setIsMonitoring(true);
+        alert('开启成功');
+      })
+      .catch(err => {
+        setIsMonitoring(false);
+        alert('开启失败');
+      });
+  }
+
+  function read(index: number) {
+    bleModule
+      .read(index)
+      .then((data: string) => {
+        setReadData(data);
+      })
+      .catch(err => {
+        alert('读取失败');
+      });
+  }
+
+  function write(writeType: 'write' | 'writeWithoutResponse') {
+    return (index: number) => {
+      if (inputText.length === 0) {
+        alert('请输入消息内容');
+        return;
+      }
+
+      bleModule[writeType](inputText, index)
+        .then(() => {
+          bleReceiveData.current = [];
+          setWriteData(inputText);
+          setInputText('');
+        })
+        .catch(err => {
+          alert('发送失败');
+        });
+    };
+  }
+
+  function alert(text: string) {
+    Alert.alert('提示', text, [{text: '确定', onPress: () => {}}]);
+  }
+
+  function renderItem(item: ListRenderItemInfo<Peripheral>) {
+    const data = item.item;
+    const disabled = !!connectingId && connectingId !== data.id;
     return (
-      <TouchableHighlight
-        underlayColor="#0082FC"
-        onPress={() => togglePeripheralConnection(item)}>
-        <View style={[styles.row, {backgroundColor}]}>
-          <Text style={styles.peripheralName}>
-            {/* completeLocalName (item.name) & shortAdvertisingName (advertising.localName) may not always be the same */}
-            {item.name} - {item?.advertising?.localName}
-            {item.connecting && ' - Connecting...'}
+      <TouchableOpacity
+        activeOpacity={0.7}
+        disabled={disabled || isConnected}
+        onPress={() => {
+          connect(data);
+        }}
+        style={[styles.item, {opacity: disabled ? 0.5 : 1}]}>
+        <View style={{flexDirection: 'row'}}>
+          <Text style={{color: 'black'}}>{data.name ? data.name : ''}</Text>
+          <Text style={{marginLeft: 50, color: 'red'}}>
+            {connectingId === data.id ? '连接中...' : ''}
           </Text>
-          <Text style={styles.rssi}>RSSI: {item.rssi}</Text>
-          <Text style={styles.peripheralId}>{item.id}</Text>
         </View>
-      </TouchableHighlight>
+        <Text>{data.id}</Text>
+      </TouchableOpacity>
     );
-  };
+  }
+
+  function renderFooter() {
+    if (!isConnected) {
+      return;
+    }
+    return (
+      <ScrollView
+        style={{
+          marginTop: 10,
+          borderColor: '#eee',
+          borderStyle: 'solid',
+          borderTopWidth: StyleSheet.hairlineWidth * 2,
+        }}>
+        <Characteristic
+          label="写数据（write）："
+          action="发送"
+          content={writeData}
+          characteristics={bleModule.writeWithResponseCharacteristicUUID}
+          onPress={write('write')}
+          input={{inputText, setInputText}}
+        />
+
+        <Characteristic
+          label="写数据（writeWithoutResponse）："
+          action="发送"
+          content={writeData}
+          characteristics={bleModule.writeWithoutResponseCharacteristicUUID}
+          onPress={write('writeWithoutResponse')}
+          input={{inputText, setInputText}}
+        />
+
+        <Characteristic
+          label="读取的数据："
+          action="读取"
+          content={readData}
+          characteristics={bleModule.readCharacteristicUUID}
+          onPress={read}
+        />
+
+        <Characteristic
+          label={`通知监听接收的数据（${
+            isMonitoring ? '监听已开启' : '监听未开启'
+          }）：`}
+          action="开启通知"
+          content={receiveData}
+          characteristics={bleModule.nofityCharacteristicUUID}
+          onPress={notify}
+        />
+      </ScrollView>
+    );
+  }
 
   return (
-    <>
-      <StatusBar />
-      <SafeAreaView style={styles.body}>
-        <View style={styles.buttonGroup}>
-          <Pressable style={styles.scanButton} onPress={startScan}>
-            <Text style={styles.scanButtonText}>
-              {isScanning ? 'Scanning...' : 'Scan Bluetooth'}
-            </Text>
-          </Pressable>
-
-          <Pressable style={styles.scanButton} onPress={retrieveConnected}>
-            <Text style={styles.scanButtonText} lineBreakMode="middle">
-              {'Retrieve connected peripherals'}
-            </Text>
-          </Pressable>
-
-          <Pressable style={styles.scanButton} onPress={readCharacteristics}>
-            <Text style={styles.scanButtonText}>Read characteristics</Text>
-          </Pressable>
-        </View>
-
-        {Platform.OS === 'android' && (
-          <>
-            <View style={styles.buttonGroup}>
-              <Pressable style={styles.scanButton} onPress={startCompanionScan}>
-                <Text style={styles.scanButtonText}>{'Scan Companion'}</Text>
-              </Pressable>
-
-              <Pressable
-                style={styles.scanButton}
-                onPress={getAssociatedPeripherals}>
-                <Text style={styles.scanButtonText}>
-                  {'Get Associated Peripherals'}
-                </Text>
-              </Pressable>
-            </View>
-
-            <View style={styles.buttonGroup}>
-              <Pressable style={styles.scanButton} onPress={enableBluetooth}>
-                <Text style={styles.scanButtonText}>{'Enable Bluetooh'}</Text>
-              </Pressable>
-            </View>
-          </>
-        )}
-
-        {Array.from(peripherals.values()).length === 0 && (
-          <View style={styles.row}>
-            <Text style={styles.noPeripherals}>
-              No Peripherals, press "Scan Bluetooth" above.
-            </Text>
-          </View>
-        )}
-
-        <FlatList
-          data={Array.from(peripherals.values())}
-          contentContainerStyle={{rowGap: 12}}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-        />
-      </SafeAreaView>
-    </>
+    <SafeAreaView style={styles.container}>
+      <Header
+        isConnected={isConnected}
+        scaning={scaning}
+        disabled={scaning || !!connectingId}
+        onPress={isConnected ? disconnect : scan}
+      />
+      <FlatList
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+        data={dataList}
+        extraData={connectingId}
+      />
+      {renderFooter()}
+    </SafeAreaView>
   );
 };
 
-const boxShadow = {
-  shadowColor: '#000',
-  shadowOffset: {
-    width: 0,
-    height: 2,
-  },
-  shadowOpacity: 0.25,
-  shadowRadius: 3.84,
-  elevation: 5,
-};
-
 const styles = StyleSheet.create({
-  engine: {
-    position: 'absolute',
-    right: 10,
-    bottom: 0,
-    color: Colors.black,
-  },
-  buttonGroup: {
-    flexDirection: 'row',
-    width: '100%',
-  },
-  scanButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    backgroundColor: '#0a398a',
-    margin: 10,
-    borderRadius: 12,
+  container: {
     flex: 1,
-    ...boxShadow,
+    backgroundColor: '#fff',
   },
-  scanButtonText: {
-    fontSize: 16,
-    letterSpacing: 0.25,
-    color: Colors.white,
-  },
-  body: {
-    backgroundColor: '#0082FC',
-    flex: 1,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
-  peripheralName: {
-    fontSize: 16,
-    textAlign: 'center',
-    padding: 10,
-  },
-  rssi: {
-    fontSize: 12,
-    textAlign: 'center',
-    padding: 2,
-  },
-  peripheralId: {
-    fontSize: 12,
-    textAlign: 'center',
-    padding: 2,
-    paddingBottom: 20,
-  },
-  row: {
-    marginLeft: 10,
-    marginRight: 10,
-    borderRadius: 20,
-    ...boxShadow,
-  },
-  noPeripherals: {
-    margin: 10,
-    textAlign: 'center',
-    color: Colors.white,
+  item: {
+    flexDirection: 'column',
+    borderColor: 'rgb(235,235,235)',
+    borderStyle: 'solid',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingLeft: 10,
+    paddingVertical: 8,
   },
 });
 

@@ -14,7 +14,6 @@ import {DetailScreen} from '@/pages/detail';
 import MainTabScreen, {MainTabParamList} from './MainTab';
 import H5Screen from '@/pages/h5';
 import Blutooth from '@/pages/blutooth';
-import PeripheralDetails from '@/pages/blutooth/PeripheralDetailsScreen';
 
 import LoginScreen from '@/pages/login';
 import AnimateScreen from '@/pages/animate';
@@ -75,11 +74,7 @@ function RootStackScreen() {
           options={hideHeaderOptions}
           component={Blutooth}
         />
-        <RootStack.Screen
-          name="PeripheralDetails"
-          options={hideHeaderOptions}
-          component={PeripheralDetails}
-        />
+       
         <RootStack.Screen
           name="Animate"
           options={hideHeaderOptions}
